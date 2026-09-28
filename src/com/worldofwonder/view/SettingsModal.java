@@ -28,13 +28,9 @@ public class SettingsModal extends JDialog {
         super(parent, com.worldofwonder.util.I18n.get("settings_title"), true);
         this.parent = parent;
 
-        setSize(640, 620);
-        setLocationRelativeTo(parent);
-        setResizable(false);
-
         JPanel content = new JPanel(new BorderLayout(0, 18));
         content.setBackground(new Color(13, 27, 42));
-        content.setBorder(BorderFactory.createEmptyBorder(22, 26, 22, 26));
+        content.setBorder(BorderFactory.createEmptyBorder(20, 18, 20, 18));
 
         // Header
         JPanel header = new JPanel();
@@ -76,6 +72,9 @@ public class SettingsModal extends JDialog {
         themeCardsPanel = new JPanel(new GridLayout(2, 2, 12, 12));
         themeCardsPanel.setOpaque(false);
         themeCardsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        // Cards may shrink on a small window, but the grid itself stretches to the
+        // full body width so it never reads as a sheet pinned to the left.
+        UIUtil.responsiveSize(themeCardsPanel, 404, 140, 300, 120, Integer.MAX_VALUE, 400);
         rebuildThemeButtons();
         body.add(themeCardsPanel);
         body.add(Box.createVerticalStrut(18));
@@ -94,7 +93,7 @@ public class SettingsModal extends JDialog {
 
         String currentLangText = com.worldofwonder.util.I18n.isKhmer() ? "ភាសាខ្មែរ" : "English";
         langBtn = UITheme.iconPillButton(UITheme.VectorIcon.GLOBE, com.worldofwonder.util.I18n.get("lang_active", currentLangText), UITheme.GOLD);
-        langBtn.setPreferredSize(new Dimension(220, UITheme.BTN_H_SM));
+        UIUtil.responsiveSize(langBtn, 200, UITheme.BTN_H_SM, 150, UITheme.BTN_H_SM, 200, UITheme.BTN_H_SM);
         langBtn.addActionListener(e -> {
             SoundUtil.playClick();
             com.worldofwonder.util.I18n.toggleLanguage();
@@ -119,7 +118,7 @@ public class SettingsModal extends JDialog {
         audioRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         sfxToggleBtn = UITheme.primaryButton(com.worldofwonder.util.I18n.get(SoundUtil.isMuted() ? "sfx_muted" : "sfx_enabled"));
-        sfxToggleBtn.setPreferredSize(new Dimension(180, UITheme.BTN_H_SM));
+        UIUtil.responsiveSize(sfxToggleBtn, 160, UITheme.BTN_H_SM, 120, UITheme.BTN_H_SM, 160, UITheme.BTN_H_SM);
         sfxToggleBtn.addActionListener(e -> {
             SoundUtil.toggleMute();
             updateSfxButtonState();
@@ -130,7 +129,7 @@ public class SettingsModal extends JDialog {
         audioRow.add(sfxToggleBtn);
 
         testSoundBtn = UITheme.ghostButton(com.worldofwonder.util.I18n.get("test_sound"), UITheme.TEAL);
-        testSoundBtn.setPreferredSize(new Dimension(170, UITheme.BTN_H_SM));
+        UIUtil.responsiveSize(testSoundBtn, 150, UITheme.BTN_H_SM, 110, UITheme.BTN_H_SM, 150, UITheme.BTN_H_SM);
         testSoundBtn.addActionListener(e -> {
             if (!SoundUtil.isMuted()) {
                 SoundUtil.playVictory();
@@ -144,14 +143,16 @@ public class SettingsModal extends JDialog {
         audioRow.add(testSoundBtn);
 
         body.add(audioRow);
-        content.add(body, BorderLayout.CENTER);
+        // Scroll only if the panel is ever taller than the dialog: on a normal
+        // screen no scrollbar appears and the layout is identical.
+        content.add(UIUtil.verticalScroller(body), BorderLayout.CENTER);
 
         // Footer Actions
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         footer.setOpaque(false);
 
         closeBtn = UITheme.glowButton(com.worldofwonder.util.I18n.get("btn_save_close"), UITheme.TEAL, UITheme.VIOLET);
-        closeBtn.setPreferredSize(new Dimension(150, UITheme.BTN_H_SM));
+        UIUtil.responsiveSize(closeBtn, 150, UITheme.BTN_H_SM, 120, UITheme.BTN_H_SM, 150, UITheme.BTN_H_SM);
         closeBtn.addActionListener(e -> {
             SoundUtil.playClick();
             dispose();
@@ -160,6 +161,12 @@ public class SettingsModal extends JDialog {
 
         content.add(footer, BorderLayout.SOUTH);
         setContentPane(content);
+
+        // Size to the content first, then centre. Sizing before the content exists
+        // leaves spare width on the right, which is what made this read as a
+        // right-shifted side sheet instead of a centred dialog.
+        UIUtil.centreOnOwner(this, parent, 420, 380);
+        setResizable(false);
 
         // Register language change listener
         this.langListener = this::refreshText;
@@ -270,7 +277,7 @@ public class SettingsModal extends JDialog {
             }
         };
 
-        btn.setPreferredSize(new Dimension(260, 68));
+        UIUtil.responsiveSize(btn, 196, 64, 140, 58, 196, 90);
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
         btn.setFocusPainted(false);

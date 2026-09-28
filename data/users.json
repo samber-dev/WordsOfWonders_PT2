@@ -5,8 +5,7 @@
     "email": "admin@example.com",
     "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
     "totalPoints": 780,
-    "isAdmin": true,
-    "lastClaimDate": "2026-09-20"
+    "isAdmin": true
   },
   {
     "id": 2,
@@ -14,8 +13,7 @@
     "email": "bob@example.com",
     "password": "c6ba91b90d922e159893f46c387e5dc1b3dc5c101a5a4522f03b987177a24a91",
     "totalPoints": 260,
-    "isAdmin": false,
-    "lastClaimDate": "2026-09-15"
+    "isAdmin": false
   },
   {
     "id": 3,
@@ -23,7 +21,14 @@
     "email": "rithphea@example.com",
     "password": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
     "totalPoints": 150,
-    "isAdmin": false,
-    "lastClaimDate": "2026-09-18"
+    "isAdmin": false
+  },
+  {
+    "id": 4,
+    "username": "sna",
+    "email": "sna@gmail.com",
+    "password": "681b9fc62702547bd6af2e10af1a98c4bbbd25cbed3a25d70685c54cb7ac878b",
+    "totalPoints": 0,
+    "isAdmin": false
   }
 ]

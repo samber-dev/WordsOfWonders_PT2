@@ -39,7 +39,6 @@ public class UserRepository {
                     user.setPassword(JsonUtil.getAsString(map, "password", ""));
                     user.setTotalPoints(JsonUtil.getAsInt(map, "totalPoints", 0));
                     user.setAdmin(JsonUtil.getAsBoolean(map, "isAdmin", false));
-                    user.setLastClaimDate(JsonUtil.getAsString(map, "lastClaimDate", null));
                     users.add(user);
                 }
             } catch (IOException e) {
@@ -72,9 +71,6 @@ public class UserRepository {
             map.put("password", u.getPassword());
             map.put("totalPoints", u.getTotalPoints());
             map.put("isAdmin", u.isAdmin());
-            if (u.getLastClaimDate() != null) {
-                map.put("lastClaimDate", u.getLastClaimDate());
-            }
             list.add(map);
         }
         try {
@@ -185,21 +181,6 @@ public class UserRepository {
         return false;
     }
 
-    public synchronized int claimDailyBonus(int userId, int bonusPoints) {
-        User user = findById(userId);
-        if (user == null) {
-            return -1;
-        }
-        String today = java.time.LocalDate.now().toString();
-        if (today.equals(user.getLastClaimDate())) {
-            return -2; // Already claimed today
-        }
-        user.setLastClaimDate(today);
-        user.setTotalPoints(user.getTotalPoints() + bonusPoints);
-        saveUsers();
-        return user.getTotalPoints();
-    }
-
     public synchronized boolean deleteById(int userId) {
         User target = findById(userId);
         if (target != null) {
@@ -245,9 +226,6 @@ public class UserRepository {
         }
         existing.setTotalPoints(updated.getTotalPoints());
         existing.setAdmin(updated.isAdmin());
-        if (updated.getLastClaimDate() != null) {
-            existing.setLastClaimDate(updated.getLastClaimDate());
-        }
         saveUsers();
         return true;
     }

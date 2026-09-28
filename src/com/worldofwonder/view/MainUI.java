@@ -12,22 +12,18 @@ import java.awt.Dimension;
 
 public class MainUI extends JFrame {
 
-    private static final String SCREEN_WELCOME = "welcome";
-    private static final String SCREEN_DASHBOARD = "dashboard";
-    private static final String SCREEN_QUIZ = "quiz";
-    private static final String SCREEN_WORDSEARCH = "wordsearch";
-    private static final String SCREEN_CUPS = "cups";
-    private static final String SCREEN_WORDS = "words";
-    private static final String SCREEN_MATCH = "match";
+    public static final String SCREEN_WELCOME = "welcome";
+    public static final String SCREEN_DASHBOARD = "dashboard";
+    public static final String SCREEN_WORDS = "words";
 
     private final CardLayout cards;
     private final JPanel cardsPanel;
     private final Dashboard dashboard;
     private final UITheme.FloatRoot background;
+    private String currentScreen;
 
     private final AuthController authController;
     private final GameController gameController;
-    private final QuizController quizController;
 
     public MainUI() {
         super("World of Wonder");
@@ -36,7 +32,6 @@ public class MainUI extends JFrame {
 
         this.authController = new AuthController();
         this.gameController = new GameController();
-        this.quizController = new QuizController(new GameRepository(), gameController);
 
         this.cards = new CardLayout();
         this.cardsPanel = new JPanel(cards);
@@ -45,11 +40,7 @@ public class MainUI extends JFrame {
 
         cardsPanel.add(new WelcomeScreen(this), SCREEN_WELCOME);
         cardsPanel.add(dashboard, SCREEN_DASHBOARD);
-        cardsPanel.add(new QuizGameScreen(dashboard), SCREEN_QUIZ);
-        cardsPanel.add(new WordSearchGameScreen(dashboard), SCREEN_WORDSEARCH);
-        cardsPanel.add(new CupsWaterSortGameScreen(dashboard), SCREEN_CUPS);
         cardsPanel.add(new WordsOfWondersGameScreen(dashboard), SCREEN_WORDS);
-        cardsPanel.add(new MatchGameScreen(dashboard), SCREEN_MATCH);
 
         this.background = UITheme.animatedRoot(new BorderLayout());
         background.add(cardsPanel, BorderLayout.CENTER);
@@ -61,12 +52,18 @@ public class MainUI extends JFrame {
     }
 
     public void showScreen(String name) {
+        this.currentScreen = name;
         cards.show(cardsPanel, name);
         if (background != null) {
             background.setTheme(name);
         }
         cardsPanel.revalidate();
         cardsPanel.repaint();
+    }
+
+    /** The route currently on screen: welcome, dashboard or words. */
+    public String getCurrentScreen() {
+        return currentScreen;
     }
 
     public void showDashboard() {
@@ -88,10 +85,6 @@ public class MainUI extends JFrame {
 
     public GameController getGameController() {
         return gameController;
-    }
-
-    public QuizController getQuizController() {
-        return quizController;
     }
 
     public static void main(String[] args) {

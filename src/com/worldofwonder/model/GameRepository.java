@@ -10,14 +10,13 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Model repository managing static game data (worlds, levels, questions, crossword puzzles)
+ * Model repository managing static game data (worlds, levels, crossword puzzles)
  * loaded into ArrayLists from clean JSON files.
  */
 public class GameRepository {
 
     private final List<World> worlds = new CopyOnWriteArrayList<>();
     private final List<Level> levels = new CopyOnWriteArrayList<>();
-    private final List<Question> questions = new CopyOnWriteArrayList<>();
     private final List<WowLevel> wowLevels = new CopyOnWriteArrayList<>();
 
     public GameRepository() {
@@ -71,32 +70,7 @@ public class GameRepository {
             }
         }
 
-        // 3. Questions
-        File questionsFile = new File(dataDir, "questions.json");
-        questions.clear();
-        if (questionsFile.exists()) {
-            try {
-                String json = JsonUtil.readFile(questionsFile);
-                List<Map<String, Object>> list = JsonUtil.parseList(json);
-                for (Map<String, Object> map : list) {
-                    Question q = new Question();
-                    q.setId(JsonUtil.getAsInt(map, "id", 0));
-                    q.setLevelId(JsonUtil.getAsInt(map, "levelId", 0));
-                    q.setQuestionText(JsonUtil.getAsString(map, "questionText", ""));
-                    q.setOptionA(JsonUtil.getAsString(map, "optionA", ""));
-                    q.setOptionB(JsonUtil.getAsString(map, "optionB", ""));
-                    q.setOptionC(JsonUtil.getAsString(map, "optionC", ""));
-                    q.setOptionD(JsonUtil.getAsString(map, "optionD", ""));
-                    q.setCorrectAnswer(JsonUtil.getAsString(map, "correctAnswer", ""));
-                    q.setHint(JsonUtil.getAsString(map, "hint", ""));
-                    questions.add(q);
-                }
-            } catch (IOException e) {
-                System.err.println("Failed to load questions.json: " + e.getMessage());
-            }
-        }
-
-        // 4. WOW Levels
+        // 3. WOW Levels
         File wowFile = new File(dataDir, "wow_levels.json");
         wowLevels.clear();
         if (wowFile.exists()) {
@@ -153,29 +127,10 @@ public class GameRepository {
         return result;
     }
 
-    public List<Question> getQuestionsByLevelId(int levelId) {
-        List<Question> result = new ArrayList<>();
-        for (Question q : questions) {
-            if (q.getLevelId() == levelId) {
-                result.add(q);
-            }
-        }
-        return result;
-    }
-
     public Level findLevelById(int levelId) {
         for (Level l : levels) {
             if (l.getId() == levelId) {
                 return l;
-            }
-        }
-        return null;
-    }
-
-    public Question findQuestionById(int questionId) {
-        for (Question q : questions) {
-            if (q.getId() == questionId) {
-                return q;
             }
         }
         return null;

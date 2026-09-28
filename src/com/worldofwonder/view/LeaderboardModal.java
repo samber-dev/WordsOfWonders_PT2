@@ -269,7 +269,7 @@ public class LeaderboardModal extends JDialog {
         name.setAlignmentX(Component.CENTER_ALIGNMENT);
         step.add(name);
 
-        JLabel pts = new JLabel(user.getTotalPoints() + " " + I18n.get("pts"), SwingConstants.CENTER);
+        JLabel pts = new JLabel(user.getTotalPoints() + " " + I18n.get("pts_suffix"), SwingConstants.CENTER);
         pts.setFont(UITheme.bodyFont(Font.BOLD, 12));
         pts.setForeground(UITheme.GOLD);
         pts.setAlignmentX(Component.CENTER_ALIGNMENT);

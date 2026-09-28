@@ -742,10 +742,6 @@ public final class UITheme {
         });
     }
 
-    public static JPanel pageRoot(JComponent card) {
-        return screenPage(card);
-    }
-
     /** Transparent scrollable page container that centers the given card while letting a
      *  single shared background layer (owned by MainUI) show through.
      *  Automatically enables smooth vertical & horizontal scrolling when the window or display
@@ -881,12 +877,6 @@ public final class UITheme {
                 return null;
             }
             switch (screenName.toLowerCase().trim()) {
-                case "quiz":
-                    return getOrLoadImage("Game1.jpeg");
-                case "wordsearch":
-                    return getOrLoadImage("Game2.jpeg");
-                case "cups":
-                    return getOrLoadImage("Game3.jpeg");
                 case "words":
                     return getOrLoadImage("Game4.jpeg");
                 default:
@@ -2039,7 +2029,6 @@ public final class UITheme {
         EYE_OFF,
         GLOBE,
         GEAR,
-        GIFT,
         TROPHY,
         SHIELD,
         SEARCH,
@@ -2152,33 +2141,6 @@ public final class UITheme {
                     g.drawLine(x1, y1, x2, y2);
                 }
                 g.fillOval(cx - rHole, cy - rHole, rHole * 2, rHole * 2);
-                break;
-            }
-            case GIFT: {
-                int bw = size * 74 / 100;
-                int bh = size * 52 / 100;
-                int bx = x + (size - bw) / 2;
-                int by = y + size * 40 / 100;
-                int lw = size * 84 / 100;
-                int lh = size * 16 / 100;
-                int lx = x + (size - lw) / 2;
-                int ly = by - lh;
-                // Box
-                g.fillRoundRect(bx, by, bw, bh, 4, 4);
-                // Lid
-                g.fillRoundRect(lx, ly, lw, lh, 4, 4);
-                // Ribbon vertical
-                Color ribbonColor = new Color(255, 255, 255, 180);
-                g.setColor(ribbonColor);
-                int rw = Math.max(2, size * 14 / 100);
-                g.fillRect(x + (size - rw) / 2, ly, rw, lh + bh);
-                // Ribbon bow on top
-                g.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                int bowW = size * 22 / 100;
-                int bowH = size * 14 / 100;
-                int cx = x + size / 2;
-                g.drawOval(cx - bowW, ly - bowH + 1, bowW, bowH);
-                g.drawOval(cx, ly - bowH + 1, bowW, bowH);
                 break;
             }
             case TROPHY: {
@@ -3632,7 +3594,7 @@ public final class UITheme {
     }
 
     public enum GameIcon {
-        QUIZ, WORDSEARCH, CUPS, WORDS, MATCH, WHEEL
+        WORDS
     }
 
     public static class GameModeCard extends JButton {
@@ -3744,11 +3706,11 @@ public final class UITheme {
 
             int yOff = -lift;
 
-            int pillW = Math.max(130, (int) Math.round(w * 0.52f));
-            int pillH = Math.max(42, (int) Math.round(h * 0.11f));
+            int pillW = Math.max(130, Math.round(w * 0.52f));
+            int pillH = Math.max(42, Math.round(h * 0.11f));
             int pillY = h - pillH - 18 + yOff;
 
-            int titleSize = Math.max(22, (int) Math.round(h * 0.060f));
+            int titleSize = Math.max(22, Math.round(h * 0.060f));
             g2.setFont(fontFor(title, Font.BOLD, titleSize));
             FontMetrics tm = g2.getFontMetrics();
             String titleClipped = clip(tm, title, w - 20);
@@ -3756,7 +3718,7 @@ public final class UITheme {
             g2.setColor(isEnabled() ? new Color(0xf0f6ff) : new Color(0x8fa2bd));
             g2.drawString(titleClipped, (w - tm.stringWidth(titleClipped)) / 2, titleY);
 
-            int subSize = Math.max(14, (int) Math.round(h * 0.040f));
+            int subSize = Math.max(14, Math.round(h * 0.040f));
             g2.setFont(fontFor(subtitle, Font.PLAIN, subSize));
             FontMetrics sm = g2.getFontMetrics();
             int subBaseline = titleY + tm.getDescent() + 6 + sm.getAscent();
@@ -3783,7 +3745,7 @@ public final class UITheme {
                     0, pillY + pillH / 2f, new Color(255, 255, 255, 0)));
             g2.fillRoundRect(px, pillY, pillW, pillH / 2, pillH / 2, pillH / 2);
 
-            int pillSize = Math.max(15, (int) Math.round(h * 0.042f));
+            int pillSize = Math.max(15, Math.round(h * 0.042f));
             String play = com.worldofwonder.util.I18n.get("play_now");
             g2.setFont(fontFor(play, Font.BOLD, pillSize));
             FontMetrics pf = g2.getFontMetrics();
@@ -3876,139 +3838,12 @@ public final class UITheme {
 
         private void paintIcon(Graphics2D g2, GameIcon icon, int cx, int cy, int size) {
             switch (icon) {
-                case QUIZ:
-                    paintGlobeIcon(g2, cx, cy, size);
-                    break;
-                case WORDSEARCH:
-                    paintSearchIcon(g2, cx, cy, size);
-                    break;
-                case CUPS:
-                    paintCupsIcon(g2, cx, cy, size);
-                    break;
                 case WORDS:
                     paintWordsIcon(g2, cx, cy, size);
-                    break;
-                case MATCH:
-                    paintWordsIcon(g2, cx, cy, size);
-                    break;
-                case WHEEL:
-                    paintGlobeIcon(g2, cx, cy, size);
                     break;
                 default:
                     break;
             }
-        }
-
-        private void paintGlobeIcon(Graphics2D g2, int cx, int cy, int size) {
-            float r = size / 2f;
-            g2.setPaint(new RadialGradientPaint(
-                    new Point2D.Float(cx - r * 0.35f, cy - r * 0.42f), r * 1.35f,
-                    new float[]{0f, 1f},
-                    new Color[]{new Color(0xbfefff), new Color(0x166a8f)}));
-            g2.fillOval((int) (cx - r), (int) (cy - r), size, size);
-
-            g2.setColor(new Color(255, 255, 255, 120));
-            g2.setStroke(new BasicStroke(Math.max(1.5f, size * 0.028f)));
-            g2.drawOval((int) (cx - r * 0.5f), (int) (cy - r), size, size);
-            g2.drawOval((int) (cx - r), (int) (cy - r * 0.5f), size, size);
-            g2.drawLine(cx, (int) (cy - r), cx, (int) (cy + r));
-            g2.drawLine((int) (cx - r), cy, (int) (cx + r), cy);
-
-            g2.setPaint(new RadialGradientPaint(
-                    new Point2D.Float(cx - r * 0.42f, cy - r * 0.48f), r * 0.75f,
-                    new float[]{0f, 1f},
-                    new Color[]{new Color(255, 255, 255, 200), new Color(255, 255, 255, 0)}));
-            g2.fillOval((int) (cx - r * 0.6f), (int) (cy - r * 0.65f),
-                    (int) (r * 0.85f), (int) (r * 0.5f));
-
-            g2.setStroke(new BasicStroke(Math.max(2.5f, size * 0.055f)));
-            g2.setPaint(new LinearGradientPaint(cx - r, cy - r, cx + r, cy + r,
-                    new float[]{0f, 1f},
-                    new Color[]{new Color(0x9fe7ff), new Color(0xffc93c)}));
-            g2.drawOval((int) (cx - r), (int) (cy - r), size, size);
-        }
-
-        private void paintSearchIcon(Graphics2D g2, int cx, int cy, int size) {
-            int gridSize = Math.round(size * 0.55f);
-            int gx = cx - gridSize / 2;
-            int gy = cy - gridSize / 2;
-            int n = 3;
-            float cell = gridSize / (float) n;
-            Color[] tileColors = {TEAL, VIOLET, GOLD, PINK, ICE};
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    int tx = Math.round(gx + j * cell);
-                    int ty = Math.round(gy + i * cell);
-                    int cw = (int) cell - 2;
-                    Color c = tileColors[(i + j) % tileColors.length];
-                    g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 120));
-                    g2.fillRoundRect(tx, ty, cw, cw, Math.max(3, cw / 3), Math.max(3, cw / 3));
-                    g2.setColor(new Color(255, 255, 255, 90));
-                    g2.setStroke(new BasicStroke(1f));
-                    g2.drawRoundRect(tx, ty, cw, cw, Math.max(3, cw / 3), Math.max(3, cw / 3));
-                    if ((i + j) % 3 == 0) {
-                        int dot = Math.max(2, cw / 4);
-                        g2.setColor(new Color(255, 255, 255, 150));
-                        g2.fillOval(tx + cw / 2 - dot / 2, ty + cw / 2 - dot / 2, dot, dot);
-                    }
-                }
-            }
-
-            float mr = size * 0.24f;
-            float mx = cx + size * 0.20f;
-            float my = cy + size * 0.22f;
-            float mw = mr * 2f;
-            g2.setPaint(new RadialGradientPaint(
-                    new Point2D.Float(mx - mr * 0.4f, my - mr * 0.4f), mr * 1.4f,
-                    new float[]{0f, 1f},
-                    new Color[]{new Color(255, 255, 255, 190), new Color(0x9fe7ff)}));
-            g2.setStroke(new BasicStroke(Math.max(3f, size * 0.085f)));
-            g2.drawOval((int) (mx - mr), (int) (my - mr), (int) mw, (int) mw);
-            float hx = mx + mr * 0.72f;
-            float hy = my + mr * 0.72f;
-            float ex = mx + mr * 1.55f;
-            float ey = my + mr * 1.55f;
-            g2.setStroke(new BasicStroke(Math.max(3f, size * 0.085f)));
-            g2.drawLine((int) hx, (int) hy, (int) ex, (int) ey);
-            g2.setPaint(new RadialGradientPaint(
-                    new Point2D.Float(mx, my), mr * 0.9f,
-                    new float[]{0f, 1f},
-                    new Color[]{new Color(255, 255, 255, 60), new Color(255, 255, 255, 0)}));
-            g2.fillOval((int) (mx - mr * 0.6f), (int) (my - mr * 0.6f),
-                    (int) (mr * 1.2f), (int) (mr * 1.2f));
-        }
-
-        private void paintCupsIcon(Graphics2D g2, int cx, int cy, int size) {
-            float u = size / 100f;
-            int tubeW = Math.round(34 * u);
-            int tubeH = Math.round(56 * u);
-
-            int rx = cx + Math.round(24 * u);
-            int ry = cy - Math.round(20 * u);
-            drawTestTube(g2, rx, ry, tubeW, tubeH, 0.72f,
-                    new Color(0x4be3ff), new Color(0x0fa896));
-
-            int lx = cx - Math.round(30 * u);
-            int ly = cy - Math.round(34 * u);
-            g2.translate(lx, ly);
-            g2.rotate(-0.85f);
-            drawTestTube(g2, -tubeW / 2, -tubeH / 2, tubeW, tubeH, 0.55f,
-                    new Color(0xffd166), new Color(0xf5a623));
-            g2.rotate(0.85f);
-            g2.translate(-lx, -ly);
-
-            float sx = lx + tubeW * 0.15f;
-            float sy = ly - tubeH * 0.42f;
-            float ex = rx - tubeW * 0.18f;
-            float ey = ry + tubeH * 0.30f;
-            g2.setStroke(new BasicStroke(Math.max(2.5f, size * 0.030f)));
-            g2.setColor(new Color(0xffd166));
-            java.awt.geom.Path2D stream = new java.awt.geom.Path2D.Float();
-            stream.moveTo(sx, sy);
-            stream.quadTo(sx + (ex - sx) * 0.55f, sy + (ey - sy) * 0.9f, ex, ey);
-            g2.draw(stream);
-            g2.setColor(new Color(255, 201, 60, 140));
-            g2.fillOval((int) ex, (int) (ey - 3 * u), Math.max(3, Math.round(6 * u)), Math.max(3, Math.round(6 * u)));
         }
 
         private void paintWordsIcon(Graphics2D g2, int cx, int cy, int size) {
@@ -4282,8 +4117,8 @@ public final class UITheme {
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             quality(g2);
-            String text = getText();
-            if (text != null && !text.isEmpty()) {
+            String text = plainText(getText());
+            if (!text.isEmpty()) {
                 FontMetrics fm = g2.getFontMetrics(getFont());
                 int w = fm.stringWidth(text);
                 int x = (getWidth() - w) / 2;
@@ -4297,6 +4132,24 @@ public final class UITheme {
                 g2.drawString(text, x, y);
             }
             g2.dispose();
+        }
+
+        /** This label draws through {@code drawString}, which has no HTML renderer.
+         *  Any markup handed to it would otherwise be painted literally, so strip
+         *  tags and resolve the handful of entities Swing's HTML would have. */
+        static String plainText(String raw) {
+            if (raw == null) {
+                return "";
+            }
+            String s = raw;
+            if (s.length() > 4 && s.substring(0, 5).equalsIgnoreCase("<html")) {
+                s = s.replaceAll("(?i)<br\\s*/?>", " ");
+                s = s.replaceAll("(?i)</?div[^>]*>", " ");
+                s = s.replaceAll("(?i)<[^>]+>", "");
+                s = s.replace("&nbsp;", " ").replace("&amp;", "&")
+                        .replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", "\"");
+            }
+            return s.replaceAll("\\s+", " ").trim();
         }
     }
 

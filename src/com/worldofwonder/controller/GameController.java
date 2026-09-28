@@ -63,21 +63,6 @@ public class GameController {
         return userRepository.getLeaderboard(limit);
     }
 
-    public boolean canClaimDailyBonus(int userId) {
-        if (userId <= 0) return true; // Guests can claim locally
-        User user = userRepository.findById(userId);
-        if (user == null) return false;
-        String today = java.time.LocalDate.now().toString();
-        return !today.equals(user.getLastClaimDate());
-    }
-
-    public int claimDailyBonus(int userId, int bonusPoints) {
-        if (userId <= 0) {
-            return bonusPoints; // For guest session
-        }
-        return userRepository.claimDailyBonus(userId, bonusPoints);
-    }
-
     public List<User> getAllUsers() {
         return userRepository.getAllUsers();
     }

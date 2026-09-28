@@ -60,7 +60,7 @@ public final class SoundUtil {
         playCached(key, () -> synthesizeBell(0.10, freq, 0.65));
     }
 
-    /** Satisfying harmonious chime for a correct word guess or correct quiz answer */
+    /** Satisfying harmonious chime for a correctly spelled word */
     public static void playCorrect() {
         playCached("correct", () -> synthesizeChord(0.35, new double[]{523.25, 659.25, 783.99, 1046.50}, 0.75));
     }
@@ -78,11 +78,6 @@ public final class SoundUtil {
     /** Playful whoosh/shuffle sound */
     public static void playShuffle() {
         playCached("shuffle", () -> synthesizeShuffle(0.20, 0.65));
-    }
-
-    /** Liquid trickle sound for water sorting */
-    public static void playPour() {
-        playCached("pour", () -> synthesizePour(0.28, 0.6));
     }
 
     /** Triumphant victory fanfare for level / puzzle completion */
@@ -224,20 +219,6 @@ public final class SoundUtil {
             double f = 300.0 + 800.0 * Math.sin(Math.PI * (t / durationSec));
             double env = Math.sin(Math.PI * (t / durationSec));
             double sample = Math.sin(2.0 * Math.PI * f * t) * env * volume * 0.6;
-            writeSample(buffer, i, sample);
-        }
-        return buffer;
-    }
-
-    private static byte[] synthesizePour(double durationSec, double volume) {
-        int totalSamples = (int) (SAMPLE_RATE * durationSec);
-        byte[] buffer = new byte[totalSamples * 2];
-        for (int i = 0; i < totalSamples; i++) {
-            double t = (double) i / SAMPLE_RATE;
-            double f1 = 400.0 + 120.0 * Math.sin(t * 30.0);
-            double f2 = 620.0 + 90.0 * Math.cos(t * 45.0);
-            double env = Math.min(1.0, t / 0.04) * (1.0 - t / durationSec);
-            double sample = (0.6 * Math.sin(2.0 * Math.PI * f1 * t) + 0.4 * Math.sin(2.0 * Math.PI * f2 * t)) * env * volume;
             writeSample(buffer, i, sample);
         }
         return buffer;

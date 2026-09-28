@@ -8,7 +8,6 @@ public class User {
     private String password;
     private int totalPoints;
     private boolean isAdmin;
-    private String lastClaimDate;
 
     public User() {
     }
@@ -75,14 +74,6 @@ public class User {
         isAdmin = admin;
     }
 
-    public String getLastClaimDate() {
-        return lastClaimDate;
-    }
-
-    public void setLastClaimDate(String lastClaimDate) {
-        this.lastClaimDate = lastClaimDate;
-    }
-
     public String getRankTitle() {
         if (totalPoints >= 600) return com.worldofwonder.util.I18n.get("rank_legendary");
         if (totalPoints >= 300) return com.worldofwonder.util.I18n.get("rank_gold");
@@ -92,8 +83,6 @@ public class User {
     }
 
     private int hearts = 5;           // Max 5 hearts, lose 1 per wrong answer
-    private int streakCount = 0;       // Consecutive login days
-    private String lastLoginDate;      // Track daily logins for streak
     private int hintCoins = 0;         // Currency for hints/power-ups
     private String avatarUrl;          // Cached avatar URL or local path
 
@@ -103,22 +92,6 @@ public class User {
 
     public void setHearts(int hearts) {
         this.hearts = hearts;
-    }
-
-    public int getStreakCount() {
-        return streakCount;
-    }
-
-    public void setStreakCount(int streakCount) {
-        this.streakCount = streakCount;
-    }
-
-    public String getLastLoginDate() {
-        return lastLoginDate;
-    }
-
-    public void setLastLoginDate(String lastLoginDate) {
-        this.lastLoginDate = lastLoginDate;
     }
 
     public int getHintCoins() {
@@ -166,24 +139,4 @@ public class User {
         return false;
     }
 
-    // Update login streak - call on each login
-    public boolean updateStreak() {
-        String today = java.time.LocalDate.now().toString();
-        if (today.equals(lastLoginDate)) return false; // already logged in today
-        
-        if (lastLoginDate != null) {
-            java.time.LocalDate last = java.time.LocalDate.parse(lastLoginDate);
-            java.time.LocalDate todayDate = java.time.LocalDate.now();
-            long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(last, todayDate);
-            if (daysBetween == 1) {
-                streakCount++; // consecutive day
-            } else if (daysBetween > 1) {
-                streakCount = 1; // streak broken, reset
-            }
-        } else {
-            streakCount = 1; // first login
-        }
-        lastLoginDate = today;
-        return true; // streak updated
-    }
 }

@@ -33,45 +33,6 @@ public class ApiService {
         return dir;
     }
 
-    private static String htmlDecode(String s) {
-        if (s == null) return null;
-        return s.replace("&quot;", "\"")
-                .replace("&#039;", "'")
-                .replace("&amp;", "&")
-                .replace("&lt;", "<")
-                .replace("&gt;", ">")
-                .replace("&shy;", "")
-                .replace("&rsquo;", "'")
-                .replace("&ldquo;", "\"")
-                .replace("&rdquo;", "\"");
-    }
-
-    public static boolean isOnline() {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://clients3.google.com/generate_204"))
-                    .timeout(Duration.ofSeconds(2))
-                    .GET()
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() == 204;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public static int getOpenTDBCategory(int worldId) {
-        switch (worldId) {
-            case 1: return 23; // Egypt -> History
-            case 2: return 17; // Space -> Science & Nature
-            case 3: return 27; // Ocean -> Animals
-            case 4: return 17; // Dinosaurs -> Science & Nature
-            case 5: return 23; // Medieval -> History
-            case 6: return 22; // Rainforest -> Geography
-            default: return 9; // General Knowledge
-        }
-    }
-
     private static <T> void executeAsync(HttpRequest request, AsyncHandler<T> handler, Consumer<T> onSuccess, Consumer<Exception> onError) {
         SwingWorker<T, Void> worker = new SwingWorker<>() {
             @Override
@@ -107,77 +68,8 @@ public class ApiService {
 
     // A. OpenTDB Trivia API
     @SuppressWarnings("unchecked")
-    public static void fetchTrivia(int categoryId, String difficulty, int amount, Consumer<List<Map<String, Object>>> onSuccess, Consumer<Exception> onError) {
-        String url = String.format("https://opentdb.com/api.php?amount=%d&category=%d&difficulty=%s&type=multiple",
-                amount, categoryId, difficulty);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(6))
-                .GET()
-                .build();
-                
-        executeAsync(request, body -> {
-            Map<String, Object> map = JsonUtil.parseObject(body);
-            if (map.containsKey("results")) {
-                List<Map<String, Object>> results = (List<Map<String, Object>>) map.get("results");
-                for (Map<String, Object> q : results) {
-                    if (q.containsKey("question")) q.put("question", htmlDecode((String) q.get("question")));
-                    if (q.containsKey("correct_answer")) q.put("correct_answer", htmlDecode((String) q.get("correct_answer")));
-                    if (q.containsKey("incorrect_answers")) {
-                        List<Object> incores = (List<Object>) q.get("incorrect_answers");
-                        List<Object> decoded = new ArrayList<>();
-                        for (Object inc : incores) {
-                            decoded.add(htmlDecode((String) inc));
-                        }
-                        q.put("incorrect_answers", decoded);
-                    }
-                }
-                return results;
-            }
-            throw new Exception("Invalid OpenTDB response");
-        }, onSuccess, onError);
-    }
-
     // B. Datamuse Word API
-    public static void fetchThemedWords(String theme, int wordLength, int maxResults, Consumer<List<String>> onSuccess, Consumer<Exception> onError) {
-        String pattern = wordLength > 0 ? "?".repeat(wordLength) : "*";
-        String encodedTheme = URLEncoder.encode(theme, StandardCharsets.UTF_8);
-        String url = String.format("https://api.datamuse.com/words?ml=%s&sp=%s&max=%d", encodedTheme, pattern, maxResults);
-        
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(6))
-                .GET()
-                .build();
-                
-        executeAsync(request, body -> {
-            List<String> words = new ArrayList<>();
-            java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"word\"\\s*:\\s*\"([^\"]+)\"").matcher(body);
-            while (m.find() && words.size() < maxResults) {
-                String word = m.group(1);
-                if (!word.contains(" ")) {
-                    words.add(word.toUpperCase());
-                }
-            }
-            return words;
-        }, onSuccess, onError);
-    }
-
     // C. Fun Facts (Numbers API)
-    public static void fetchNumberFact(int number, Consumer<String> onSuccess, Consumer<Exception> onError) {
-        String url = String.format("http://numbersapi.com/%d/trivia?json", number);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(6))
-                .GET()
-                .build();
-        executeAsync(request, body -> {
-            Map<String, Object> map = JsonUtil.parseObject(body);
-            if (map.containsKey("text")) return (String) map.get("text");
-            throw new Exception("Invalid Numbers API response");
-        }, onSuccess, onError);
-    }
-
     // D. Random Fun Fact (Useless Facts API)
     public static void fetchRandomFact(Consumer<String> onSuccess, Consumer<Exception> onError) {
         String url = "https://uselessfacts.jsph.pl/api/v2/facts/random?language=en";
@@ -266,36 +158,6 @@ public class ApiService {
     }
 
     // G. Dreamlo Leaderboard
-    public static void submitScore(String privateCode, String username, int score, Runnable onSuccess, Consumer<Exception> onError) {
-        String encodedUser = URLEncoder.encode(username, StandardCharsets.UTF_8);
-        String url = String.format("http://dreamlo.com/lb/%s/add/%s/%d", privateCode, encodedUser, score);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(6))
-                .GET()
-                .build();
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                    throw new RuntimeException("HTTP Error: " + response.statusCode());
-                }
-                return null;
-            }
-            @Override
-            protected void done() {
-                try {
-                    get();
-                    if (onSuccess != null) onSuccess.run();
-                } catch (Exception e) {
-                    if (onError != null) onError.accept(e instanceof java.util.concurrent.ExecutionException ? (Exception) e.getCause() : e);
-                }
-            }
-        };
-        worker.execute();
-    }
-
     @SuppressWarnings("unchecked")
     public static void fetchLeaderboard(String publicCode, int limit, Consumer<List<Map<String, Object>>> onSuccess, Consumer<Exception> onError) {
         String url = String.format("http://dreamlo.com/lb/%s/json/%d", publicCode, limit);

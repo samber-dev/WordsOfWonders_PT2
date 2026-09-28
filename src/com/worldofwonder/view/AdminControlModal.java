@@ -33,8 +33,6 @@ public class AdminControlModal extends JDialog {
         this.gameController = gameController;
         this.currentAdminUsername = currentAdminUsername;
 
-        setSize(940, 640);
-        setLocationRelativeTo(parent);
         setResizable(true);
 
         JPanel content = new JPanel(new BorderLayout(0, 16));
@@ -47,6 +45,11 @@ public class AdminControlModal extends JDialog {
 
         setContentPane(content);
         refreshTable();
+
+        // Clamp to the owner, then centre, so a small screen cannot push the
+        // dialog off to one side.
+        setSize(940, 640);
+        UIUtil.centreOnOwner(this, parent, 720, 420);
     }
 
     private JPanel buildHeader() {
@@ -103,8 +106,7 @@ public class AdminControlModal extends JDialog {
                 com.worldofwonder.util.I18n.get("admin_col_email"),
                 com.worldofwonder.util.I18n.get("admin_col_points"),
                 com.worldofwonder.util.I18n.get("admin_col_rank"),
-                com.worldofwonder.util.I18n.get("admin_col_role"),
-                com.worldofwonder.util.I18n.get("admin_col_claim")
+                com.worldofwonder.util.I18n.get("admin_col_role")
         };
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
@@ -220,8 +222,7 @@ public class AdminControlModal extends JDialog {
                         u.getEmail() != null ? u.getEmail() : "-",
                         u.getTotalPoints(),
                         u.getRankTitle(),
-                        u.isAdmin() ? com.worldofwonder.util.I18n.get("admin_role_admin") : com.worldofwonder.util.I18n.get("admin_role_player"),
-                        u.getLastClaimDate() != null ? u.getLastClaimDate() : com.worldofwonder.util.I18n.get("admin_never")
+                        u.isAdmin() ? com.worldofwonder.util.I18n.get("admin_role_admin") : com.worldofwonder.util.I18n.get("admin_role_player")
                 });
             }
             if (countLabel != null) {
